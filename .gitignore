@@ -1,0 +1,14 @@
+.git
+
+*.o
+
+config.h
+
+dwm/default/dwm
+dwm/custom/dwm
+
+st/default/st
+st/custom/st
+
+dmenu/default/dmenu
+dmenu/default/dmenu
