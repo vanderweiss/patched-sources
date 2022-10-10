@@ -1,8 +1,8 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx  = 1;        /* border pixel of windows */
-static const unsigned int gappx     = 7;        /* gaps between windows */
+static const unsigned int borderpx  = 3;        /* border pixel of windows */
+static const unsigned int gappx     = 22;        /* gaps between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 
 static const int showbar            = 1;        /* 0 means no bar */
@@ -12,7 +12,7 @@ static const char *fonts[]          = { "ProFont IIx Nerd Font Mono:style=bold:s
 static const char dmenufont[]       = "ProFont IIx Nerd Font Mono:size=13";
 
 static const char col_main[]		= "#7419c2";
-static const char col_sub[]			= "#7000aa";
+static const char col_sub[]			= "#db009b";
 static const char col_set[]			= "#eeeeee";
 static const char col_idle[]		= "#cccccc";
 static const char col_half[]		= "#bbbbbb";
