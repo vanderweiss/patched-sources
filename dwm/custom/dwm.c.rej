@@ -1,23 +1,10 @@
---- dwm.c
-+++ dwm.c
-@@ -729,17 +729,17 @@ drawbar(Monitor *m)
- 		x += w;
- 	}
- 	w = blw = TEXTW(m->ltsymbol);
--	drw_setscheme(drw, scheme[SchemeNorm]);
-+	drw_setscheme(drw, scheme[SchemeTagsNorm]);
- 	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
- 
- 	if ((w = m->ww - tw - x) > bh) {
- 		if (m->sel) {
--			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
-+			drw_setscheme(drw, scheme[m == selmon ? SchemeInfoSel : SchemeInfoNorm]);
- 			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
- 			if (m->sel->isfloating)
- 				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
- 		} else {
--			drw_setscheme(drw, scheme[SchemeNorm]);
-+			drw_setscheme(drw, scheme[SchemeInfoNorm]);
- 			drw_rect(drw, x, 0, w, bh, 1, 1);
- 		}
- 	}
+--- dwm.c	2019-06-06 21:23:27.023328450 +0200
++++ dwm.c	2019-06-20 15:07:01.089767947 +0200
+@@ -213,6 +213,7 @@ static void tagmon(const Arg *arg);
+ static void tile(Monitor *);
+ static void togglebar(const Arg *arg);
+ static void togglefloating(const Arg *arg);
++static void togglescratch(const Arg *arg);
+ static void toggletag(const Arg *arg);
+ static void toggleview(const Arg *arg);
+ static void unfocus(Client *c, int setfocus);

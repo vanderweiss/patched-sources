@@ -1,67 +1,61 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx  = 3;        /* border pixel of windows */
-static const unsigned int gappx     = 22;        /* gaps between windows */
+static const unsigned int borderpx  = 2;        /* border pixel of windows */
+static const unsigned int gappx     = 5;        /* gaps between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
-
+static const int swallowfloating    = 0;        /* 1 means swallow floating windows by default */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
+static const int startontag			= 0;		/* 0 means no tag active on start */
+static const int vertpad            = 10;       /* vertical padding of bar */
+static const int sidepad            = 10;       /* horizontal padding of bar */
 
-static const char *fonts[]          = { "ProFont IIx Nerd Font Mono:style=bold:size=13" };
-static const char dmenufont[]       = "ProFont IIx Nerd Font Mono:size=13";
+static const char *fonts[]          = {
+	"ProFont IIx Nerd Font Mono:pixelsize=14:antialias=true:autohint=true",
+	"Font Awesome 6 Pro:pixelsize=14:antialias=true:autohint=true",
+};
+static const char dmenufont[]       = "ProFont IIx Nerd Font:pixelsize=14:antialias=true:autohint=true";
 
-static const char col_main[]		= "#7419c2";
-static const char col_sub[]			= "#db009b";
-static const char col_set[]			= "#eeeeee";
-static const char col_idle[]		= "#cccccc";
-static const char col_half[]		= "#bbbbbb";
-static const char col_win[]			= "#222222";
-static const char col_ph[]			= "#000000";
+static const char col_bd[]       = "#000000";
+static const char col_bh[]       = "#7419c2";
+static const char col_fd[]       = "#bbbbbb";
+static const char col_fh[]       = "#eeeeee";
 
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
-	[SchemeNorm] = { col_idle, col_main, col_win },
-	[SchemeSel]  = { col_set, col_main,  col_main  },
-	[SchemeStatus]  = { col_idle, col_main,  col_ph  }, 
-	[SchemeTagsSel]  = { col_set, col_sub,  col_ph  }, 
-	[SchemeTagsNorm]  = { col_idle, col_main,  col_ph  }, 
-	[SchemeInfoSel]  = { col_set, col_main,  col_ph  },
-	[SchemeInfoNorm]  = { col_idle, col_main,  col_ph  }, 
-};
-
-static const unsigned int baralpha = 180;
-static const unsigned int borderalpha = OPAQUE;
-
-static const unsigned int alphas[][3]      = {
-	/*               fg      bg        border     */
-	[SchemeNorm] = { OPAQUE, baralpha, borderalpha },
-	[SchemeSel]  = { OPAQUE, baralpha, borderalpha },
+	[SchemeNorm] = { col_fd, col_bh, col_bh },
+	[SchemeSel]  = { col_fh, col_bh,  col_bh },
+	[SchemeStatus]  = { col_fd, col_bd,  "#000000"  }, // Statusbar right {text,background,not used but cannot be empty}
+	[SchemeTagsSel]  = { col_fh, col_bh,  "#000000"  }, // Tagbar left selected {text,background,not used but cannot be empty}
+	[SchemeTagsNorm]  = { col_fd, col_bd,  "#000000"  }, // Tagbar left unselected {text,background,not used but cannot be empty}
+	[SchemeInfoSel]  = { col_fh, col_bh,  "#000000"  }, // infobar middle  selected {text,background,not used but cannot be empty}
+	[SchemeInfoNorm]  = { col_fd, col_bd,  "#000000"  }, // infobar middle  unselected {text,background,not used but cannot be empty}
 };
 
 /* tagging */
-static const char *tags[] = { "", "", "", "", ""};
+static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
 static const Rule rules[] = {
 	/* xprop(1):
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class      instance    title       tags mask     isfloating   monitor */
-	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
-	{ "Firefox",  NULL,       NULL,       0,       	    0,           -1 },
+	/* class     instance  title           tags mask  isfloating  isterminal  noswallow  monitor */
+	{ "St",      NULL,     NULL,           0,         0,          1,           0,        -1 },
+	{ NULL,      NULL,     "Event Tester", 0,         0,          0,           1,        -1 }, /* xev */
 };
 
 /* layout(s) */
 static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
-static const int lockfullscreen = 1;
+static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-	{ "[T]",      tile },    /* first entry is default */
-	{ "[F]",      NULL },    /* no layout function means floating behavior */
+	{ "[]=",      tile },    /* first entry is default */
+	{ "><>",      NULL },    /* no layout function means floating behavior */
 	{ "[M]",      monocle },
 };
 
@@ -78,13 +72,22 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_main, "-nf", col_half, "-sb", col_main, "-sf", col_set, NULL };
+static const char *dmenucmd[] = { 
+	"dmenu_run", "-m", dmenumon, "-fn", dmenufont, 
+	"-nb", col_bd, "-nf", col_fd, "-sb", col_bh, "-sf", col_fh,
+	"-y", "10", 
+	NULL
+};
 static const char *termcmd[]  = { "st", NULL };
 
-static Key keys[] = {
+static const char scratchpadname[] = "scratchpad";
+static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
+
+static const Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
+	{ MODKEY,						XK_grave,  togglescratch,  {.v = scratchpadcmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
@@ -124,7 +127,7 @@ static Key keys[] = {
 
 /* button definitions */
 /* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
-static Button buttons[] = {
+static const Button buttons[] = {
 	/* click                event mask      button          function        argument */
 	{ ClkLtSymbol,          0,              Button1,        setlayout,      {0} },
 	{ ClkLtSymbol,          0,              Button3,        setlayout,      {.v = &layouts[2]} },

@@ -5,8 +5,11 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char *font = "ProFont IIx Nerd Font Mono:size=13:antialias=true:autohint=true";
-static int borderpx = 0;
+static char *font = "ProFont IIx Nerd Font Mono:pixelsize=15:antialias=true:autohint=true";
+static char *font2[] = {
+	"Font Awesome 6 Pro:pixelsize=15:antialias=true:autohint=true",
+};
+static int borderpx = 3;
 
 /*
  * What program is execed by st depends of these precedence rules:
@@ -16,7 +19,7 @@ static int borderpx = 0;
  * 4: value of shell in /etc/passwd
  * 5: value of shell in config.h
  */
-static char *shell = "/bin/bash";
+static char *shell = "/bin/sh";
 char *utmp = NULL;
 /* scroll program: to enable use a string like "scroll" */
 char *scroll = NULL;
@@ -26,7 +29,7 @@ char *stty_args = "stty raw pass8 nl -echo -iexten -cstopb 38400";
 char *vtiden = "\033[?6c";
 
 /* Kerning / character bounding-box multipliers */
-static float cwscale = 0.9;
+static float cwscale = 0.85;
 static float chscale = 1.0;
 
 /*
@@ -68,18 +71,6 @@ static unsigned int blinktimeout = 800;
 static unsigned int cursorthickness = 2;
 
 /*
- * 1: render most of the lines/blocks characters without using the font for
- *    perfect alignment between cells (U2500 - U259F except dashes/diagonals).
- *    Bold affects lines thickness if boxdraw_bold is not 0. Italic is ignored.
- * 0: disable (render all U25XX glyphs normally from the font).
- */
-const int boxdraw = 0;
-const int boxdraw_bold = 1;
-
-/* braille (U28XX):  1: render as adjacent "pixels",  0: use font */
-const int boxdraw_braille = 1;
-
-/*
  * bell volume. It must be a value between -100 and 100. Use 0 for disabling
  * it
  */
@@ -105,42 +96,26 @@ char *termname = "st-256color";
  */
 unsigned int tabspaces = 8;
 
-/* bg opacity */
-float alpha = 0.8;
-
 /* Terminal colors (16 first used in escape sequence) */
 static const char *colorname[] = {
 
-	// Regular colors
-
 	"#000000",
-	"#db009b",
-	"#00bfa4",
-	"#f9f871",
-	"#005cf4",
-	"#7419c2",
-	"#00aed4",
-	"#9578a8",
+    "#db009b",
+    "#00bfa4",
+    "#f9f871",
+    "#005cf4",
+    "#7419c2",
+    "#00aed4",
+    "#9578a8",
 
-	// Bright colors
-	
-	"#b2a8b8",
-	"#db009b",
-	"#00bfa4",
-	"#f9f871",
-	"#005cf4",
-	"#7419c2",
-	"#00aed4",
-	"#9578a8",
-
-	/*"#b2a8b8",
-	"#ff7e4e",
-	"#c3fcf2",
-	"#f9f871",
-	"#daeefc",
-	"#ffa5ff",
-	"#00aed9",
-	"#9560a8",*/
+    "#b2a8b8",
+    "#db009b",
+    "#00bfa4",
+    "#f9f871",
+    "#005cf4",
+    "#7419c2",
+    "#00aed4",
+    "#9578a8",
 
 	[255] = 0,
 
@@ -157,7 +132,7 @@ static const char *colorname[] = {
  * foreground, background, cursor, reverse cursor
  */
 unsigned int defaultfg = 258;
-unsigned int defaultbg = 234;
+unsigned int defaultbg = 259;
 unsigned int defaultcs = 256;
 static unsigned int defaultrcs = 257;
 
@@ -197,6 +172,8 @@ static unsigned int defaultattr = 11;
  */
 static uint forcemousemod = ShiftMask;
 
+#include "autocomplete.h"
+
 /*
  * Internal mouse shortcuts.
  * Beware that overloading Button1 will disable the selection.
@@ -214,6 +191,8 @@ static MouseShortcut mshortcuts[] = {
 #define MODKEY Mod1Mask
 #define TERMMOD (ControlMask|ShiftMask)
 
+#define ACMPL_MOD ControlMask|Mod1Mask
+
 static Shortcut shortcuts[] = {
 	/* mask                 keysym          function        argument */
 	{ XK_ANY_MOD,           XK_Break,       sendbreak,      {.i =  0} },
@@ -229,7 +208,15 @@ static Shortcut shortcuts[] = {
 	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
 	{ ShiftMask,            XK_Page_Up,     kscrollup,      {.i = -1} },
-	{ ShiftMask,            XK_Page_Down,   kscrolldown,    {.i = -1} },
+    { ShiftMask,            XK_Page_Down,   kscrolldown,    {.i = -1} },
+	{ ACMPL_MOD,            XK_slash,       autocomplete,   { .i = ACMPL_WORD        } },
+	{ ACMPL_MOD,            XK_period,      autocomplete,   { .i = ACMPL_FUZZY_WORD  } },
+	{ ACMPL_MOD,            XK_comma,       autocomplete,   { .i = ACMPL_FUZZY       } },
+	{ ACMPL_MOD,            XK_apostrophe,  autocomplete,   { .i = ACMPL_SUFFIX      } },
+	{ ACMPL_MOD,            XK_semicolon,   autocomplete,   { .i = ACMPL_SURROUND    } },
+	{ ACMPL_MOD,            XK_bracketright,autocomplete,   { .i = ACMPL_WWORD       } },
+	{ ACMPL_MOD,            XK_bracketleft, autocomplete,   { .i = ACMPL_FUZZY_WWORD } },
+	{ ACMPL_MOD,            XK_equal,       autocomplete,   { .i = ACMPL_UNDO        } },
 };
 
 /*
