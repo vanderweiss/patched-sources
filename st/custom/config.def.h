@@ -5,11 +5,11 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char *font = "ProFont IIx Nerd Font Mono:pixelsize=15:antialias=true:autohint=true";
+static char *font = "undefined-medium:pixelsize=15:antialias=true:autohint=true";
 static char *font2[] = {
-	"Font Awesome 6 Pro:pixelsize=15:antialias=true:autohint=true",
+	"hi",
 };
-static int borderpx = 3;
+static int borderpx = 10;
 
 /*
  * What program is execed by st depends of these precedence rules:
@@ -29,7 +29,7 @@ char *stty_args = "stty raw pass8 nl -echo -iexten -cstopb 38400";
 char *vtiden = "\033[?6c";
 
 /* Kerning / character bounding-box multipliers */
-static float cwscale = 0.85;
+static float cwscale = 1.0;
 static float chscale = 1.0;
 
 /*
@@ -100,22 +100,22 @@ unsigned int tabspaces = 8;
 static const char *colorname[] = {
 
 	"#000000",
-    "#db009b",
-    "#00bfa4",
-    "#f9f871",
-    "#005cf4",
-    "#7419c2",
-    "#00aed4",
-    "#9578a8",
+	"#F64740",
+	"#92AD94",
+	"#FCFDC3",
+	"#4D7393",
+	"#725AC1",
+	"#CCD5FF",
+	"#EEEEFB",
 
-    "#b2a8b8",
-    "#db009b",
-    "#00bfa4",
-    "#f9f871",
-    "#005cf4",
-    "#7419c2",
-    "#00aed4",
-    "#9578a8",
+	"#CDCDCD",
+	"#F64740",
+	"#92AD94",
+	"#FCFDC3",
+	"#4D7393",
+	"#725AC1",
+	"#CCD5FF",
+	"#FFFFFF",
 
 	[255] = 0,
 
@@ -172,8 +172,6 @@ static unsigned int defaultattr = 11;
  */
 static uint forcemousemod = ShiftMask;
 
-#include "autocomplete.h"
-
 /*
  * Internal mouse shortcuts.
  * Beware that overloading Button1 will disable the selection.
@@ -191,8 +189,6 @@ static MouseShortcut mshortcuts[] = {
 #define MODKEY Mod1Mask
 #define TERMMOD (ControlMask|ShiftMask)
 
-#define ACMPL_MOD ControlMask|Mod1Mask
-
 static Shortcut shortcuts[] = {
 	/* mask                 keysym          function        argument */
 	{ XK_ANY_MOD,           XK_Break,       sendbreak,      {.i =  0} },
@@ -207,16 +203,6 @@ static Shortcut shortcuts[] = {
 	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
 	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
-	{ ShiftMask,            XK_Page_Up,     kscrollup,      {.i = -1} },
-    { ShiftMask,            XK_Page_Down,   kscrolldown,    {.i = -1} },
-	{ ACMPL_MOD,            XK_slash,       autocomplete,   { .i = ACMPL_WORD        } },
-	{ ACMPL_MOD,            XK_period,      autocomplete,   { .i = ACMPL_FUZZY_WORD  } },
-	{ ACMPL_MOD,            XK_comma,       autocomplete,   { .i = ACMPL_FUZZY       } },
-	{ ACMPL_MOD,            XK_apostrophe,  autocomplete,   { .i = ACMPL_SUFFIX      } },
-	{ ACMPL_MOD,            XK_semicolon,   autocomplete,   { .i = ACMPL_SURROUND    } },
-	{ ACMPL_MOD,            XK_bracketright,autocomplete,   { .i = ACMPL_WWORD       } },
-	{ ACMPL_MOD,            XK_bracketleft, autocomplete,   { .i = ACMPL_FUZZY_WWORD } },
-	{ ACMPL_MOD,            XK_equal,       autocomplete,   { .i = ACMPL_UNDO        } },
 };
 
 /*
